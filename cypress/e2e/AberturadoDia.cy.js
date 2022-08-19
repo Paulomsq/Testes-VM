@@ -31,13 +31,12 @@ describe('Abertura do Dia', () => {
       
       //Realiza login com informações presentes em acesso.json
       cy.readFile('cypress/fixtures/acesso.json').then((user) => {
-        let p = 1;
+        let p = 1; //Selecionar usuário de acesso.json
         cy.login(user[p].login, user[p].senha, user[p].dia, user[p].mes, user[p].ano, user[p].cpf);
       });
     });
   
-    //OK
-    it('Verifica se está logando', () => {
+    it('Validando Login', () => {
       
       //Validando requisição de autenticação
       cy.request({
@@ -58,10 +57,30 @@ describe('Abertura do Dia', () => {
           .should('be.not.empty');
       });
 
-      cy.screenshot(`Login ${dia}/${mes}`);
+      cy.screenshot(`Login ${dia}-${mes}`);
     });
 
-    //OK
+    it('Validando Lista de Papéis', () => {
+      
+      //Indo para TS
+      cy.TS();
+
+      //Verifica se componente de Lista de Papeis está visível
+      cy.get('#component_6').should('be.visible');
+
+      //Verifica se o papel selecionado está presente na lista de papeis 
+      cy.contains('div', 'TF473 ')
+        .should('be.visible')
+        .and('not.be.empty');
+
+      //Verifica se o papel selecionado está presente na lista de papeis 
+      cy.contains('div', 'PETR4 ')
+        .should('be.visible')
+        .and('not.be.empty');
+      
+      cy.screenshot(`ListaDePapeis ${dia}-${mes}`);
+    });
+
     it('Validando Pedra', ()=>{
       
       //Indo para TS
@@ -111,35 +130,11 @@ describe('Abertura do Dia', () => {
         .should('not.be.empty')
         .and('be.visible');
 
-      cy.screenshot(`Pedra ${dia}/${mes}`);
+      cy.screenshot(`Pedra ${dia}-${mes}`);
         
     });
 
-    //OK
-    it('Validando Lista de papéis', () => {
-      
-      //Indo para TS
-      cy.TS();
-
-      //Verifica se componente de Lista de Papeis está visível
-      cy.get('#component_6').should('be.visible');
-
-      //Verifica se o papel selecionado está presente na lista de papeis 
-      cy.contains('div', 'TF473 ')
-        .should('be.visible')
-        .and('not.be.empty');
-
-      //Verifica se o papel selecionado está presente na lista de papeis 
-      cy.contains('div', 'PETR4 ')
-        .should('be.visible')
-        .and('not.be.empty');
-      
-      cy.screenshot(`ListaDePapeis ${dia}/${mes}`);
-    });
-
-
-    //OK
-    it('Validando notícias', () => {
+    it('Validando Notícias', () => {
       
       //Indo para TS
       cy.TS();
@@ -152,11 +147,10 @@ describe('Abertura do Dia', () => {
       cy.get('.table > tbody > :nth-child(1) > :nth-child(1)').invoke('prop', 'innerText').should(dtNoticia => {
         expect(dtNoticia).to.contain(dia + '/' + mes);
       });
-      cy.screenshot(`Notícias ${dia}/${mes}`);
+      cy.screenshot(`Notícias ${dia}-${mes}`);
     });
 
-    //OK
-    it('Validando gráfico', () => {
+    it('Validando Gráfico', () => {
 
       //Indo para TS
       cy.TS();
@@ -174,7 +168,7 @@ describe('Abertura do Dia', () => {
       cy.get('.highcharts-series-1.highcharts-tracker').find('path');
       cy.wait(1500);
       //Evidencia o gráfico de hoje
-      cy.screenshot(`GráficoHoje ${dia}/${mes}`);
+      cy.screenshot(`GráficoHoje ${dia}-${mes}`);
 
       //Indo para o gráfico de ontem
       cy.contains('button', 'Hoje')
@@ -190,11 +184,10 @@ describe('Abertura do Dia', () => {
       //Verifica se acha linhas do gráfico
       cy.get('.highcharts-tracker').find('path');
       //Evidencia o gráfico de hoje
-      cy.screenshot(`GráficoOntem ${dia}/${mes}`);
+      cy.screenshot(`GráficoOntem ${dia}-${mes}`);
 
     });
 
-    //OK
     it('Validando Ranking Corretoras', () => {
       
       //Indo para TS
@@ -220,10 +213,9 @@ describe('Abertura do Dia', () => {
       //Verifica se a lista de compra e venda está visível
       cy.get('div.ranking-container > .ranking-brokerage').should('be.visible').and('not.be.empty');
 
-      cy.screenshot(`RankingCorretoras ${dia}/${mes}`);
+      cy.screenshot(`RankingCorretoras ${dia}-${mes}`);
     });
 
-    //OK
     it('Validando Aluguel', () => {
       
       //Indo para o TS
@@ -256,10 +248,10 @@ describe('Abertura do Dia', () => {
         pro = pro.length;
         if(pro > 132){
           cy.log('Aluguel OK!');
-          cy.screenshot(`Aluguel-OK ${dia}/${mes}`);
+          cy.screenshot(`Aluguel-OK ${dia}-${mes}`);
         }else{
           cy.log('Aluguel NOK!');
-          cy.screenshot(`Aluguel-NOK ${dia}/${mes}`);
+          cy.screenshot(`Aluguel-NOK ${dia}-${mes}`);
         }
       });
 
@@ -278,16 +270,15 @@ describe('Abertura do Dia', () => {
         pro = pro.length;
         if(pro > 132){
           cy.log('Aluguel OK!');
-          cy.screenshot(`Aluguel-OK ${dia}/${mes}`);
+          cy.screenshot(`Aluguel-OK ${dia}-${mes}`);
         }else{
           cy.log('Aluguel NOK!');
-          cy.screenshot(`Aluguel-NOK ${dia}/${mes}`);
+          cy.screenshot(`Aluguel-NOK ${dia}-${mes}`);
         }
       });
     });
 
-    //OK
-    it('Validando alerta de preço', () => {
+    it('Validando Alerta de Preço', () => {
       
       //Indo para TS
       cy.TS();
@@ -309,17 +300,17 @@ describe('Abertura do Dia', () => {
         .click();
       
       //Verifica alerta
-      cy.get(':nth-child(n) > .toast-message > .ng-binding')
+      cy.get(':nth-child(n) > .toast-message > .ng-binding', {timeout:35000})
         .should('be.visible')
         .and('contain', 'TF473');
 
       //Evidência
-      cy.screenshot(`Cotação ${dia}/${mes}`);
+      cy.screenshot(`Cotação ${dia}-${mes}`);
 
     });
   });
 
-  context.only('Envio de ordem',() => {
+  context('Envio de Ordem',() => {
     before(() => {
 
       //Configuração para screenshots
@@ -345,12 +336,10 @@ describe('Abertura do Dia', () => {
       //Digitar na ordem: login, senha, dia, mes, ano, CPF
       cy.readFile('cypress/fixtures/acesso.json').then((user) => {
         cy.login(user[0].login, user[0].senha, user[0].dia, user[0].mes, user[0].ano, user[0].cpf);
-      })
-      //cy.login('44539679856', 'Pa75667388', '11', '01', '2001', '445');
-      
+      });      
     });
 
-    it('Validando Envio de ordem', () => {
+    it('Validando Envio de Ordem', () => {
       
       //Indo para TS
       cy.TS();
@@ -379,7 +368,7 @@ describe('Abertura do Dia', () => {
       cy.contains('div', ' Ordem enviada para o mercado com sucesso')
         .should('be.visible');
 
-      cy.screenshot(`ConfirmaçãoDeOrdem ${dia}/${mes}`);
+      cy.screenshot(`ConfirmaçãoDeOrdem ${dia}-${mes}`);
       
       cy.get('#ts-widget-header > #welcome-tour-11 > .ts-widget-toolbar-right > .pull-left > .btn').click();
 
@@ -402,7 +391,7 @@ describe('Abertura do Dia', () => {
       .invoke('prop', 'textContent')
       .should('contain', 'Confirmada');
 
-      cy.screenshot(`LiveOrders ${dia}/${mes}`);
+      cy.screenshot(`LiveOrders ${dia}-${mes}`);
     });
   });
 });
